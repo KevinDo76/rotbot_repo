@@ -12,6 +12,19 @@ client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
+
 // Log in to Discord with your client's token
 client.login(token);
-console.log("Logon");
+client.on("ready", () => {
+	start()
+});
+
+
+function start()
+{
+	console.log("Logon")
+	const channel = client.channels.cache.get('1292683542509125703');
+	channel.send('hello!')
+  		.then(message => console.log(`Sent message: ${message.content}`))
+  		.catch(console.error);
+}
