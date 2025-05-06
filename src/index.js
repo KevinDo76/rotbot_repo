@@ -27,8 +27,8 @@ function start()
 	client.get
 	client.on("messageCreate", async(message) => {
 		if(message.content.toLowerCase().startsWith(clientPingTag)) {
-		  let textContent = message.content.replace(clientPingTag, "");
-		  message.channel.send({ content: `${message.author}`+message.member.displayName+": "+textContent });
+		  let textContent = message.content.replace(clientPingTag, "").trimStart();
+		  message.channel.send({ content: `${message.author}`+message.member.displayName+': '+textContent });
 		  console.log(textContent)
 		}
 	});
