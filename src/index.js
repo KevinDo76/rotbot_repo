@@ -64,9 +64,12 @@ async function start()
 		if(message.content.toLowerCase().startsWith(clientPingTag)) {
 			let textContent = message.content.replace(clientPingTag, "").trimStart();
 			message.channel.sendTyping();
-			let typingInterval = setInterval(() => {message.channel.sendTyping(); console.log("typing sent")}, 1000);
+			let typingInterval = setInterval(() => {message.channel.sendTyping(); console.log("typing sent")}, 2000);
+
+
 			try {
-				let generate_result = await  ollama_interact.message_send(required_model, textContent);
+				let generate_result = await ollama_interact.message_send(required_model, textContent);
+				console.log(generate_result);
 				generate_result["response"] = generate_result["response"].replace(/<think>[\s\S]*?<\/think>/g, "");
 				generate_result["response"] = generate_result["response"].split("\n");
 				let i=0;
@@ -91,7 +94,7 @@ async function start()
 				
 
 			} catch (error) {
-				message.channel.send({ content: error });
+				message.channel.send({ content: "failure "+error });
 			}
 			clearInterval(typingInterval);
 			console.log("event done")

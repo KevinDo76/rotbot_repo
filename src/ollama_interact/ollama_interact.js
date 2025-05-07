@@ -90,7 +90,7 @@ async function module_load_model(name)
 async function module_message_send(name, message)
 {
     return new Promise((resolve, reject) => {
-        let data = JSON.stringify({model: `${name}`, prompt: `${message} `, stream: false, system: `${system_prompt}`});
+        let data = JSON.stringify({model: `${name}`, prompt: `${message} `, stream: true, system: `${system_prompt}`});
 
         const options = {
             hostname: 'localhost',
@@ -104,15 +104,24 @@ async function module_message_send(name, message)
         };
         
         const req = https.request(options, async (res) => {
-            let data = '';
-        
+            let data = {};
+            let response = "";
+            let last_chunk;
             res.on('data', (chunk) => {
-            data += chunk;
+                response+=JSON.parse(chunk)["response"];
+                last_chunk = chunk;
+                if(response.length>8000)
+                {
+                    console.log("CUT SHORT!");
+                    data["response"]=response;
+                    req.destroy();
+                    resolve(data);
+                }
             });
         
-            res.on('end', () => {
-                let data_array = JSON.parse(data);
-                resolve(data_array);
+            res.on('end', () => {;
+                data["response"]=response;
+                resolve(data);
             });
         
             res.on('error', (error) => {
