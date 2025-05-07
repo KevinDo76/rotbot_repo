@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-const required_model = 'qwen3:4b';
+const required_model = 'deepseek-r1:7b';
 const { Client, Events, GatewayIntentBits, MessageActivityType } = require('discord.js');
 const { token } = require('../config.json');
 const ollama_interact = require('./ollama_interact/ollama_interact.js')
