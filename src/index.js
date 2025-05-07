@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-const required_model = 'deepseek-r1:7b';
+const required_model = 'qwen3:4b';
 const { Client, Events, GatewayIntentBits, MessageActivityType } = require('discord.js');
 const { token } = require('./config.json');
 const ollama_interact = require('./ollama_interact/ollama_interact.js')
@@ -64,7 +64,7 @@ async function start()
 			let typingInterval = setInterval(() => {message.channel.sendTyping()}, 2000);
 			try {
 				let generate_result = await  ollama_interact.message_send(required_model, textContent);
-				if (generate_result["response"].length > 4000)
+				if (generate_result["response"].length > 2000)
 				{
 					throw "Reponse too long error! length: "+generate_result["response"].length;
 				}
