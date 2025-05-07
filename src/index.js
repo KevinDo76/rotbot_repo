@@ -61,9 +61,11 @@ async function start()
 	client.on("messageCreate", async(message) => {
 		if(message.content.toLowerCase().startsWith(clientPingTag)) {
 			let textContent = message.content.replace(clientPingTag, "").trimStart();
-			let typingInterval = setInterval(() => {message.channel.sendTyping()}, 2000);
+			message.channel.sendTyping();
+			let typingInterval = setInterval(() => {message.channel.sendTyping()}, 9000);
 			try {
 				let generate_result = await  ollama_interact.message_send(required_model, textContent);
+				generate_result["response"] = generate_result["response"].replace(/<think>[\s\S]*?<\/think>/g, "");
 				if (generate_result["response"].length > 2000)
 				{
 					throw "Reponse too long error! length: "+generate_result["response"].length;
@@ -73,6 +75,7 @@ async function start()
 				message.channel.send({ content: error });
 			}
 			clearInterval(typingInterval);
+			console.log("event done")
 			// message.channel.send({ content: `${message.author}`+message.member.displayName+': '+textContent });
 		}
 	});	
