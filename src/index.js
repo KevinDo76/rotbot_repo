@@ -3,7 +3,8 @@ const required_model = 'qwen3:4b';
 const { Client, Events, GatewayIntentBits, MessageActivityType } = require('discord.js');
 const { token } = require('../config.json');
 const ollama_interact = require('./ollama_interact/ollama_interact.js')
-
+let chatHistory = []
+let generation_inprogress = false
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -62,25 +63,33 @@ async function start()
 	let clientPingTag = "<@"+client.application.id+">";
 	client.on("messageCreate", async(message) => {
 		if(message.content.toLowerCase().startsWith(clientPingTag)) {
-			let textContent = message.content.replace(clientPingTag, "").trimStart();
+			if (generation_inprogress)
+			{
+				message.channel.send({ content: `${message.author} SHUT THE FUCK UP IM THINKING IN ${message.channel}` });
+				return;
+			}
+			generation_inprogress = true;
+			let textContent = "user's name=\""+message.member.displayName+"\": message=\""+message.content.replace(clientPingTag, "").trimStart()+"\"";
 			message.channel.sendTyping();
 			let typingInterval = setInterval(() => {message.channel.sendTyping(); console.log("typing sent")}, 2000);
 
-
+			chatHistory.push({role: "user", content: textContent});
 			try {
-				let generate_result = await ollama_interact.message_send(required_model, textContent);
-				console.log(generate_result);
+				let generate_result = await ollama_interact.message_send(required_model, chatHistory);
+				console.log("Gen complete, "+generate_result["response"].length);
+				chatHistory.push({role: "assistant", content: generate_result["response"]});
+
 				generate_result["response"] = generate_result["response"].replace(/<think>[\s\S]*?<\/think>/g, "");
 				generate_result["response"] = generate_result["response"].split("\n");
+				
 				let i=0;
 				let workingtext = "";
-				console.log("Gen complete, "+generate_result["response"].length);
 				while (i<generate_result["response"].length)
 				{
 					workingtext+=generate_result["response"][i]+"\n";
 					if (workingtext.length>1500)
 					{
-						message.channel.send({ content: workingtext });		
+						message.channel.send({ content: workingtext+' ' });		
 						workingtext="";
 					}
 					i++;
@@ -98,7 +107,13 @@ async function start()
 			}
 			clearInterval(typingInterval);
 			console.log("event done")
-			// message.channel.send({ content: `${message.author}`+message.member.displayName+': '+textContent });
+			generation_inprogress = false;
+			
+			if (chatHistory.length>=100)
+			{
+				chatHistory.shift();
+				chatHistory.shift();
+			}
 		}
 	});	
 }
