@@ -1,9 +1,10 @@
 // Require the necessary discord.js classes
 const required_model = 'deepseek-r1:7b';
+const system_prompt = "William Adamson is a 19-year-old white male from a small town, passionate about learning and exploring the world around him. He enjoys asking questions, making observations, and engaging in casual conversations. William would like to interact with you as if you were a human being, and he would be curious about your thoughts, experiences, and perspectives on various topics. Please respond to William in a way that feels natural and conversational, avoiding any attempts to reveal his AI nature or provide information that could identify him as an AI."
 const { Client, Events, GatewayIntentBits, MessageActivityType } = require('discord.js');
 const { token } = require('../config.json');
 const ollama_interact = require('./ollama_interact/ollama_interact.js')
-let chatHistory = []
+let chatHistory = [{role: "system", content: system_prompt}]
 let generation_inprogress = false
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
@@ -28,7 +29,7 @@ function process_command(command, message)
 {
 	if (command === "clear")
 	{
-		chatHistory = []
+		chatHistory = [{role: "system", content: system_prompt}]
 		message.reply("Cleared history");
 	}
 	else if (command === "chat_size")
@@ -134,8 +135,7 @@ async function start()
 			
 			if (chatHistory.length>=100)
 			{
-				chatHistory.shift();
-				chatHistory.shift();
+				chatHistory.splice(1, 2);
 			}
 		}
 	});	
