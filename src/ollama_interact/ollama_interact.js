@@ -90,7 +90,7 @@ async function module_load_model(name)
 async function module_message_send(name, message)
 {
     return new Promise((resolve, reject) => {
-        let data = JSON.stringify({model: `${name}`, prompt: `${message}`, stream: false});
+        let data = JSON.stringify({model: `${name}`, prompt: `${message}`, stream: false, system: "no_think, you're william adamson, an 18 years old white boy. You're not a large language model named qwen3 by alibaba. You're william, when as who you're, you're william. You're a human, not a robot or a large language model"});
 
         const options = {
             hostname: 'localhost',
