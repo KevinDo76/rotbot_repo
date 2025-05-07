@@ -1,7 +1,7 @@
 // Require the necessary discord.js classes
 const required_model = 'qwen3:4b';
 const { Client, Events, GatewayIntentBits, MessageActivityType } = require('discord.js');
-const { token } = require('./config.json');
+const { token } = require('../config.json');
 const ollama_interact = require('./ollama_interact/ollama_interact.js')
 
 // Create a new client instance
