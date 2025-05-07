@@ -24,7 +24,25 @@ client.on("ready", () => {
 	start();
 });
 
-
+function process_command(command, message)
+{
+	if (command === "clear")
+	{
+		chatHistory = []
+		message.reply("Cleared history");
+	}
+	else if (command === "chat_size")
+	{
+		message.reply("History length: "+chatHistory.length);
+	} else if (command === "help") {
+		message.reply("1. clear\n2. chat_size");
+	} 
+	else 
+	{
+		message.reply("Unknown command");
+		message.reply("1. clear\n2. chat_size");
+	}
+}
 
 async function ollama_setup()
 {
@@ -62,6 +80,11 @@ async function start()
 {
 	let clientPingTag = "<@"+client.application.id+">";
 	client.on("messageCreate", async(message) => {
+		if (message.content.startsWith("ROTBOT COMMAND: "))
+		{
+			let command = message.content.replace("ROTBOT COMMAND: ", "");
+			process_command(command, message);
+		}
 		if(message.content.toLowerCase().startsWith(clientPingTag)) {
 			if (generation_inprogress)
 			{
