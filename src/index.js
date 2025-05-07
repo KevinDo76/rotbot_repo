@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-const required_model = 'qwen3:4b';
+const required_model = 'deepseek-r1:7b';
 const { Client, Events, GatewayIntentBits, MessageActivityType } = require('discord.js');
 const { token } = require('./config.json');
 const ollama_interact = require('./ollama_interact/ollama_interact.js')
@@ -22,6 +22,8 @@ client.on("ready", () => {
 	ollama_setup();
 	start();
 });
+
+
 
 async function ollama_setup()
 {
@@ -62,15 +64,33 @@ async function start()
 		if(message.content.toLowerCase().startsWith(clientPingTag)) {
 			let textContent = message.content.replace(clientPingTag, "").trimStart();
 			message.channel.sendTyping();
-			let typingInterval = setInterval(() => {message.channel.sendTyping()}, 9000);
+			let typingInterval = setInterval(() => {message.channel.sendTyping()}, 1000);
 			try {
 				let generate_result = await  ollama_interact.message_send(required_model, textContent);
 				generate_result["response"] = generate_result["response"].replace(/<think>[\s\S]*?<\/think>/g, "");
-				if (generate_result["response"].length > 2000)
+				generate_result["response"] = generate_result["response"].split("\n");
+				let i=0;
+				let workingtext = "";
+				console.log(generate_result["response"].length);
+				while (i<generate_result["response"].length)
 				{
-					throw "Reponse too long error! length: "+generate_result["response"].length;
+					workingtext+=generate_result["response"][i]+"\n";
+					if (workingtext.length>1500)
+					{
+						message.channel.send({ content: workingtext });		
+						console.log("split");
+						workingtext="";
+					}
+					i++;
 				}
-				message.channel.send({ content: generate_result["response"] });
+
+				if (workingtext.length>0)
+				{
+					console.log("final");
+					message.channel.send({ content: workingtext });
+				}
+				
+
 			} catch (error) {
 				message.channel.send({ content: error });
 			}
