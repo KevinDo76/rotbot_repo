@@ -87,7 +87,7 @@ async function module_load_model(name)
 async function module_message_send(name, chatHistory)
 {
     return new Promise((resolve, reject) => {
-        let data = {model: `${name}`, messages: chatHistory, system: `${system_prompt}`};
+        let data = {model: `${name}`, messages: chatHistory, keep_alive: "60m"};
         data = JSON.stringify(data);
         const length = Buffer.byteLength(data, 'utf8');
 
