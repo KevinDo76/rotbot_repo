@@ -69,7 +69,7 @@ async function start()
 				return;
 			}
 			generation_inprogress = true;
-			let textContent = "user's name=\""+message.member.displayName+"\": message=\""+message.content.replace(clientPingTag, "").trimStart()+"\"";
+			let textContent = message.content.replace(clientPingTag, "").trimStart();
 			message.channel.sendTyping();
 			let typingInterval = setInterval(() => {message.channel.sendTyping(); console.log("typing sent")}, 2000);
 
