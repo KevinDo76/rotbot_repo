@@ -64,21 +64,20 @@ async function start()
 		if(message.content.toLowerCase().startsWith(clientPingTag)) {
 			let textContent = message.content.replace(clientPingTag, "").trimStart();
 			message.channel.sendTyping();
-			let typingInterval = setInterval(() => {message.channel.sendTyping()}, 1000);
+			let typingInterval = setInterval(() => {message.channel.sendTyping(); console.log("typing sent")}, 1000);
 			try {
 				let generate_result = await  ollama_interact.message_send(required_model, textContent);
 				generate_result["response"] = generate_result["response"].replace(/<think>[\s\S]*?<\/think>/g, "");
 				generate_result["response"] = generate_result["response"].split("\n");
 				let i=0;
 				let workingtext = "";
-				console.log(generate_result["response"].length);
+				console.log("Gen complete, "+generate_result["response"].length);
 				while (i<generate_result["response"].length)
 				{
 					workingtext+=generate_result["response"][i]+"\n";
 					if (workingtext.length>1500)
 					{
 						message.channel.send({ content: workingtext });		
-						console.log("split");
 						workingtext="";
 					}
 					i++;
