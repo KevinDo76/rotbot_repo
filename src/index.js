@@ -79,7 +79,7 @@ async function ollama_setup()
 
 	if (!found)
 	{
-		throw "Model not installed";
+		//throw "Model not installed";
 	}
 
 	let load_result = await ollama_interact.load_model(required_model);
